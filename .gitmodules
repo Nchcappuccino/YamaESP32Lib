@@ -1,0 +1,12 @@
+[submodule "arduino-CAN"]
+	path = arduino-CAN
+	url = https://github.com/sandeepmistry/arduino-CAN
+[submodule "esp32-ps3"]
+	path = esp32-ps3
+	url = https://github.com/jvpernis/esp32-ps3
+[submodule "FastLED"]
+	path = FastLED
+	url = https://github.com/FastLED/FastLED
+[submodule "Adafruit_NeoPixel"]
+	path = Adafruit_NeoPixel
+	url = https://github.com/adafruit/Adafruit_NeoPixel
