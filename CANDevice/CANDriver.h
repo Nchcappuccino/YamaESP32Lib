@@ -7,11 +7,8 @@
 
 #define CAN_DEBUG_ON
 
-extern ESP32SJA1000Class esp32can;
-
 namespace can_device{
 
-/*WrOOM32の罠対策、面倒なのでとりあえずはボーレートの選択は手動で*/
 const long WROOM32_BAUDRATE = 1000e3;
 
 typedef struct{

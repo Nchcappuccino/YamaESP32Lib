@@ -1,7 +1,5 @@
 #include "CANDriver.h"
 
-ESP32SJA1000Class esp32can;
-
 namespace can_device{
 
 CAN_ID_t can_id;
@@ -9,8 +7,8 @@ CAN_ID_t can_id;
 CANDriver::CANDriver(long baudrate):_baudrate{baudrate}{}
 
 void CANDriver::init(){
-    esp32can.setPins(2, 4);
-    if (!esp32can.begin(_baudrate)){
+    CAN.setPins(2, 4);
+    if (!CAN.begin(_baudrate)){
         Serial.println("Starting CAN failed!");
         while (1);
     }
@@ -19,14 +17,14 @@ void CANDriver::init(){
 
 void CANDriver::send(uint32_t id,std::vector<uint8_t> &buff){
     /*new演算子によるメモリの動的確保を行ってる*/
-    esp32can.beginPacket(id);
+    CAN.beginPacket(id);
     uint8_t len = (uint8_t)buff.size();
     uint8_t *tx_buff;
     tx_buff = new uint8_t[len];
     for (uint8_t i = 0; i < len; i++)
         tx_buff[i] = buff[i];
-    esp32can.write(tx_buff, buff.size());
-    esp32can.endPacket();
+    CAN.write(tx_buff, buff.size());
+    CAN.endPacket();
 
     #ifdef CAN_DEBUG_ON
     // Serial.printf("CAN send ID = %d, len = %d\r\n",id,len);
