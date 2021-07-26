@@ -2,8 +2,6 @@
 
 namespace can_device{
 
-CAN_ID_t can_id;
-
 CANDriver::CANDriver(long baudrate):_baudrate{baudrate}{}
 
 void CANDriver::init(){

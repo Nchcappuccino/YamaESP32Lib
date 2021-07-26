@@ -23,6 +23,7 @@ const double A4 = 440;
 const double AS4 = 466.164;  //A#4
 const double B4 = 493.883;
 const double C5 = 523.251;
+const double BUZZER_STOP = 0.0;
 
 enum class IMUSerect{
     DISABLE,
@@ -48,6 +49,7 @@ class YamaMotherV3{
         int _usersw_state;
         int _dipsw1_state;
         int _dipsw2_state;
+        bool _buzzer_disable_state = false;     //trueならブザーオフ
     public:
         //GPIO系の定数がpublicな理由はハードウェアの不良時にアクセスしやすくするため.
         static constexpr uint8_t can_txd = 4;
@@ -85,6 +87,7 @@ class YamaMotherV3{
 
         //8bitを8個のLEDがいい感じに表現してくれる、第二引数で色の指定が可能.
         void LED(uint8_t array, CRGB::HTMLColorCode color);
+        void buzzerDisable(){_buzzer_disable_state = true;}
         void buzzer(double tone);
         void init();
         void update();
@@ -92,6 +95,7 @@ class YamaMotherV3{
         const int& getUserSW()        const {return _usersw_state;}
         const int& getDIPSW1()        const {return _dipsw1_state;}
         const int& getDIPSW2()        const {return _dipsw2_state;}
+        const int& getBuzzerDisableState() const {return _buzzer_disable_state;}
 };
 }
 #endif /*YAMAMOTHER_H_*/

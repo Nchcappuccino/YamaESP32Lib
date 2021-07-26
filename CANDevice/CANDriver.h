@@ -5,24 +5,11 @@
 #include <CAN.h>
 #include <vector>
 
-#define CAN_DEBUG_ON
+// #define CAN_DEBUG_ON
 
 namespace can_device{
 
 const long WROOM32_BAUDRATE = 1000e3;
-
-typedef struct{
-    struct {
-        const uint32_t SET_KP_ID = 0x001;
-        const uint32_t SET_KI_ID = 0x002;
-        const uint32_t SET_KD_ID = 0x003;
-        const uint32_t SET_DT_AND_MODE_ID = 0x004; //ここはdt以外にもいろんなモードのデータも入れる予定
-        const uint32_t UPDATE_TARGET_ID = 0x005;	//angleかspeed
-        const uint32_t MD_STATE_ID = 0x006;
-    } md;
-    //ここにstructで他のIDも追加する
-} CAN_ID_t;
-extern CAN_ID_t can_id;
 
 class CANDriver{
     private:

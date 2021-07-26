@@ -19,7 +19,8 @@ void YamaMotherV3::LED(uint8_t array, CRGB::HTMLColorCode color){
 }
 
 void YamaMotherV3::buzzer(double tone){
-    ledcWriteTone(buzzer_channel, tone);
+    if(_buzzer_disable_state == false)
+        ledcWriteTone(buzzer_channel, tone);
 }
 
 void YamaMotherV3::init(){
@@ -40,7 +41,7 @@ void YamaMotherV3::init(){
     if(_imuserect == IMUSerect::MPU6050)
         mpu6050.init();
     candriver.init();
-    ledcSetup(buzzer_channel,12000,8);
+    ledcSetup(buzzer_channel,5000,8);
     ledcAttachPin(buzzer_pin,buzzer_channel);
     Serial.printf("YamaMotherV3 init finished\r\n");
 }
