@@ -27,6 +27,13 @@ uint16_t AS5601::_read2Byte(uint8_t reg){
     _i2c_buff[1] = Wire.read();
     data = ((uint16_t)_i2c_buff[0] << 8) & 0x0F00;
     data |= (uint16_t)_i2c_buff[1];
+    if(_i2c_buff[0] == 255){
+        log_e("as5601 failed\r\n");
+        _alive = false;
+    }else{
+        _alive = true;
+    }
+
     return data;
     // printf("data %d ",data);
 }

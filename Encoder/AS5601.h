@@ -2,7 +2,7 @@
 #define AS5601_H_
 #include <Arduino.h>
 #include <Wire.h>
-
+#include "esp_log.h"
 #ifndef ROTATIONDIR
 
 #define ROTATIONDIR
@@ -44,7 +44,8 @@ class AS5601{
         float _angular_v;        //[rad/s]
         float _prev_angular_v;
         float _rpm;
-        bool _noise;    //ループの中でノイズがのっているかの判別用    
+        bool _noise;    //ループの中でノイズがのっているかの判別用   
+        bool _alive;    //AS5601と通信できてるかのフラグ,falseだと失敗してる. 
     public:
         AS5601(RotationDir dir, uint16_t range_th)
             :_dir(dir), _range_th(range_th){
@@ -56,6 +57,7 @@ class AS5601{
         const float& getAngle() const {return _angle;}
         const float& getAngularV() const {return _angular_v;}
         const float& getRPM() const {return _rpm;}
+        const bool& getAS5601Alive() const {return _alive;}
     private:
         RotationDir _dir;
         //角度が4096から0に移り変わったときに角速度がおかしくならないようにする閾値.
