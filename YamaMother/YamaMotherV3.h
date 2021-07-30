@@ -1,5 +1,5 @@
-#ifndef YAMAMOTHER_H_
-#define YAMAMOTHER_H_
+#ifndef YAMAMOTHERV3_H_
+#define YAMAMOTHERV3_H_
 
 #include <Arduino.h>
 #include <SD.h>
@@ -8,7 +8,7 @@
 #include "CANDriver.h"
 #include "esp_log.h"
 
-namespace yamamother{
+namespace yamamotherv3{
 
 const double C4 = 261.6;
 const double CS4 = 277.18;  //C#4
@@ -98,4 +98,4 @@ class YamaMotherV3{
         const int& getBuzzerDisableState() const {return _buzzer_disable_state;}
 };
 }
-#endif /*YAMAMOTHER_H_*/
+#endif /*YAMAMOTHERV3_H_*/

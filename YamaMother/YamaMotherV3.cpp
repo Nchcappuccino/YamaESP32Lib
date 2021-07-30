@@ -1,5 +1,5 @@
-#include "YamaMother.h"
-namespace yamamother{
+#include "YamaMotherv3.h"
+namespace yamamotherv3{
 void YamaMotherV3::LED(uint8_t array, CRGB::HTMLColorCode color){
     if(array < 0 || array > 255){
         log_e("YamaMotherV3 LED array is problem\r\n");
@@ -54,4 +54,4 @@ void YamaMotherV3::update(){
         mpu6050.update();
 }
 
-}/*yamamother*/
+}/*yamamotherv3*/
