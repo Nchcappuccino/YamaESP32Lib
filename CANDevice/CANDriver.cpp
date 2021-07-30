@@ -2,6 +2,8 @@
 
 namespace can_device{
 
+CANReceiveData_t can_receive_data;
+
 CANDriver::CANDriver(long baudrate):_baudrate{baudrate}{}
 
 void CANDriver::init(){
@@ -13,7 +15,7 @@ void CANDriver::init(){
     Serial.printf("CAN START!\r\n");
 }
 
-void CANDriver::send(uint32_t id,std::vector<uint8_t> &buff){
+void CANDriver::send(uint32_t& id, std::vector<uint8_t>& buff){
     /*new演算子によるメモリの動的確保を行ってる*/
     CAN.beginPacket(id);
     uint8_t len = (uint8_t)buff.size();
@@ -25,7 +27,7 @@ void CANDriver::send(uint32_t id,std::vector<uint8_t> &buff){
     CAN.endPacket();
 
     #ifdef CAN_DEBUG_ON
-    // Serial.printf("CAN send ID = %d, len = %d\r\n",id,len);
+    // Serial.printf("CAN send ID = %d, dlc = %d\r\n",id,len);
     // for (int i = 0; i < len; i++)
         // Serial.printf("Data[%d] = %d,", i, tx_buff[i]);
     // Serial.printf("\r\n");
@@ -34,24 +36,18 @@ void CANDriver::send(uint32_t id,std::vector<uint8_t> &buff){
     delete[] tx_buff;
 }
 
-void CANDriver::receive(uint32_t id,std::vector<uint8_t> buff){
-    _receive_id = id;
-    _receive_buff = buff;
+void CANDriver::receive(uint32_t id, std::vector<uint8_t> buff, uint8_t dlc){
+    can_receive_data.id = id;
+    can_receive_data.buff = buff;
+    can_receive_data.dlc = dlc;
     #ifdef CAN_DEBUG_ON
     uint8_t len = (uint8_t)buff.size();
-    Serial.printf("CAN receive ID = %d, len = %d\r\n",id,len);
+    Serial.printf("CAN receive ID = %d, dlc = %d\r\n",id,dlc);
     for (int i = 0; i < len; i++)
         Serial.printf("Data[%d] = %d,", i, buff[i]);
     Serial.printf("\r\n");
     #endif /*CAN_DEBUG_ON*/
 }
 
-uint32_t CANDriver::getID() const{
-    return _receive_id;
-}
-
-std::vector<uint8_t> CANDriver::getBuff() const{
-    return _receive_buff;
-}
 
 }/*can_device*/
