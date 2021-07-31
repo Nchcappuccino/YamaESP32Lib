@@ -4,18 +4,15 @@ namespace can_device{
 
 CANReceiveData_t can_receive_data;
 
-CANDriver::CANDriver(long baudrate):_baudrate{baudrate}{}
-
 void CANDriver::init(){
-    CAN.setPins(2, 4);
+    CAN.setPins(_rxd, _txd);
     if (!CAN.begin(_baudrate)){
-        Serial.println("Starting CAN failed!");
-        while (1);
+        while (1) log_e("Starting CAN failed!\r\n");
     }
     Serial.printf("CAN START!\r\n");
 }
 
-void CANDriver::send(uint32_t& id, std::vector<uint8_t>& buff){
+void CANDriver::send(uint32_t id, std::vector<uint8_t>& buff){
     /*new演算子によるメモリの動的確保を行ってる*/
     CAN.beginPacket(id);
     uint8_t len = (uint8_t)buff.size();

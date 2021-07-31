@@ -2,7 +2,7 @@
 namespace yamamotherv3{
 void YamaMotherV3::LED(uint8_t array, CRGB::HTMLColorCode color){
     if(array < 0 || array > 255){
-        log_e("YamaMotherV3 LED array is problem\r\n");
+        log_e("YamaMotherV3 LED array is out of range.\r\n");
         return;
     }
     uint8_t led_judg;
@@ -40,7 +40,7 @@ void YamaMotherV3::init(){
     SD.begin(sd_cs_pin,SPI ,24000000, "/sd");
     if(_imuserect == IMUSerect::MPU6050)
         mpu6050.init();
-    candriver.init();
+    can_driver.init();
     ledcSetup(buzzer_channel,5000,8);
     ledcAttachPin(buzzer_pin,buzzer_channel);
     Serial.printf("YamaMotherV3 init finished\r\n");

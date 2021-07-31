@@ -72,8 +72,7 @@ class YamaMotherV3{
         const uint8_t all_led_num = 8;
         CRGB *leds;     //メモリの動的確保用.
         mpu6050::MPU6050 mpu6050;
-        can_device::CANDriver candriver{can_device::WROOM32_BAUDRATE};
-        
+        can_device::CANDriver can_driver{can_device::WROOM32_BAUDRATE, can_rxd, can_txd};
         YamaMotherV3(IMUSerect imuserect, MotherWireSpeed wirespeed, uint8_t led_num)
             :_imuserect(imuserect),_wirespeed(wirespeed),all_led_num(led_num){
                 while(led_num < 8){
