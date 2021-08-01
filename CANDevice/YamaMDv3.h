@@ -87,6 +87,8 @@ class YamaMDv3{
         MotherReceiveData_t _receive;
         uint8_t _md_num;
         std::vector<uint8_t> _prev_buff;
+        float _prev_target;
+        bool _prev_enable_duty;
         static constexpr uint16_t A3921_PWM_RESOLUTION = 2048;
         static constexpr uint16_t A3921_PWM_HALF_RESOLUTION = 1024;
         static constexpr uint16_t LENGTH10BIT = 1024;

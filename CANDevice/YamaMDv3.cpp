@@ -57,6 +57,8 @@ void YamaMDv3::_sendInitData(){
 }
 
 void YamaMDv3::_sendTarget(){
+    //目標値が前回値と同じときはデータを送らない.
+    if(_prev_enable_duty == _send.enable_duty && _prev_target == _send.target)      return;
     switch(_init.enc_mode){
         case EncoderMode::ANGLE_MODE:{   
             std::vector<uint8_t> angle_buff;
