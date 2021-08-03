@@ -81,7 +81,7 @@ void YamaMDv3::_sendTarget(){
                 angle_buff.push_back( static_cast<uint8_t>(angle >> 4) | _md_num);
                 angle_buff.push_back(static_cast<uint8_t>(angle));
             }
-            _can_driver.send(MD_STATE_ID, angle_buff);
+            _can_driver.send(UPDATE_TARGET_ID, angle_buff);
             break;
         }
         case EncoderMode::SPEED_MODE:{
@@ -104,7 +104,7 @@ void YamaMDv3::_sendTarget(){
                 speed_buff[1] = static_cast<uint8_t>(speed >> 8);
                 speed_buff[2] = static_cast<uint8_t>(speed);
             }
-            _can_driver.send(MD_STATE_ID, speed_buff);
+            _can_driver.send(UPDATE_TARGET_ID, speed_buff);
             break;
         }
         case EncoderMode::DUTY_MODE:{
@@ -117,7 +117,7 @@ void YamaMDv3::_sendTarget(){
             if(duty > LENGTH11BIT - 1)      duty = LENGTH11BIT - 1;
             duty_buff[0] = static_cast<uint8_t>(duty >> 3) | _md_num;       //5bit目が使われてない理由はlimitSWのデータが入るようにするため(実際に入ることはなかった).
             duty_buff[1] = static_cast<uint8_t>(duty);
-            _can_driver.send(MD_STATE_ID,duty_buff);
+            _can_driver.send(UPDATE_TARGET_ID, duty_buff);
         }
         case EncoderMode::POV_MODE:{
             //処理の内容はspeed_modeと同じ.
@@ -140,7 +140,7 @@ void YamaMDv3::_sendTarget(){
                 speed_buff[1] = static_cast<uint8_t>(speed >> 8);
                 speed_buff[2] = static_cast<uint8_t>(speed);
             }
-            _can_driver.send(MD_STATE_ID, speed_buff);
+            _can_driver.send(UPDATE_TARGET_ID, speed_buff);
             break;
         }
     }
