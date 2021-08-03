@@ -31,7 +31,6 @@ class CANDriver{
         void init();
         void send(uint32_t id, std::vector<uint8_t>& buff);
         void receive(uint32_t id, std::vector<uint8_t> buff, uint8_t dlc);
-
 };
 
 }/*can_device*/

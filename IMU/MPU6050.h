@@ -93,7 +93,7 @@ class MPU6050{
         static constexpr double g = 9.798;      //重力加速度(東京)
         static constexpr double PI2 = PI * 2.0;
 
-        static constexpr int _offset_times = 10000;   //オフセットの実行回数
+        static constexpr int _offset_times = 1000;   //オフセットの実行回数
         RawData_t _raw;
         Offset_t _offset;
         IMUData_t _imudata;

@@ -75,7 +75,7 @@ void MPU6050::_getMPU6050Data(){
 
 
 void MPU6050::_getOffset(){
-    delay(250);
+    delay(2500);
     for(int i = 0; i  < _offset_times; i++){
         
         Wire.beginTransmission(DEVICE_ID);

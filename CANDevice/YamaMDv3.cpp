@@ -38,7 +38,7 @@ void YamaMDv3::_sendInitData(){
     tx_mode[1] = _init.dt;
     tx_mode[2] = static_cast<uint8_t>(_init.pid_limit >> 8);
     tx_mode[3] = static_cast<uint8_t>(_init.pid_limit);
-    tx_mode[4] = static_cast<uint8_t>(_init.pid_min_and_max_abs / 250.0f);
+    tx_mode[4] = static_cast<uint8_t>(_init.pid_min_and_max_abs * 250.0f);
     tx_mode[5] = static_cast<uint8_t>(_init.origin_angle >> 8);
     tx_mode[6] = static_cast<uint8_t>(_init.origin_angle);
     tx_mode[7] = static_cast<uint8_t>(_init.select_md_send_mode);
@@ -175,7 +175,7 @@ void YamaMDv3::_receiveOnlyTarget(){
         case EncoderMode::ANGLE_MODE:{
             int16_t angle = static_cast<int16_t>(_my_receive_data.buff[0] & 0b11110000) << 4;
             angle |= _my_receive_data.buff[1];
-            angle = angle - 1 + LENGTH11BIT;
+            angle = angle - 2047;
             _receive.md_state = static_cast<float>(angle) / 4096.0f * 360.0f * DEG_TO_RAD;
             break;
         }
@@ -190,7 +190,7 @@ void YamaMDv3::_receiveOnlyTarget(){
             //処理はANGLE_MODEと同じ.
             int16_t angle = static_cast<int16_t>(_my_receive_data.buff[0] & 0b11110000) << 4;
             angle |= _my_receive_data.buff[1];
-            angle = angle - 1 + LENGTH11BIT;
+            angle = angle - 2047;
             _receive.md_state = static_cast<float>(angle) / 4096.0f * 360.0f * DEG_TO_RAD;
             break;
         }
@@ -228,11 +228,20 @@ void YamaMDv3::stop(){
     dutyMove(0.0f);
 }
 
-void YamaMDv3::receiveTask(const can_device::CANReceiveData_t& rx_data){
-    if(rx_data.id != MD_STATE_ID || (rx_data.buff[0] & 0b00001111) != _md_num)      return;
-    _my_receive_data.id = rx_data.id;
-    _my_receive_data.buff = rx_data.buff;
-    _my_receive_data.dlc = rx_data.dlc;
+bool YamaMDv3::interruptReceiveTask(const can_device::CANReceiveData_t& rx_data){
+    if(rx_data.id != MD_STATE_ID || (rx_data.buff[0] & 0b00001111) != _md_num){
+        return true;
+    }else{
+        _my_receive_data.id = rx_data.id;
+        _my_receive_data.buff = rx_data.buff;
+        _my_receive_data.dlc = rx_data.dlc;
+        _interrupt_flag = true;
+        return false;
+    }
+}
+
+void YamaMDv3::receiveTask(){
+    if(_interrupt_flag == false || _init.select_md_send_mode == SelectMDSendMode::DATA_DISABLE)     return;
     switch(_init.select_md_send_mode){
         case SelectMDSendMode::TARGET_AND_LIMIT_SW:
             _receiveTargetANDLimit();
