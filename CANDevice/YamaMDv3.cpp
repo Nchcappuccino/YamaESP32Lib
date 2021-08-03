@@ -69,7 +69,7 @@ void YamaMDv3::_sendTarget(){
                 }
                 uint16_t duty = static_cast<uint16_t>((_send.target * 2 * LENGTH10BIT) + LENGTH11BIT);
                 if(duty > LENGTH12BIT - 1)     duty = LENGTH12BIT - 1;
-                angle_buff.push_back(static_cast<uint8_t>(duty >> 4) | _md_num);
+                angle_buff.push_back((static_cast<uint8_t>(duty >> 4) & 0b11110000) | _md_num);
                 angle_buff.push_back(static_cast<uint8_t>(duty));
                 angle_buff.push_back(255);      //ここの数字はuint8_tの範囲内のものであればなんでもいい.
             }else{
@@ -78,7 +78,7 @@ void YamaMDv3::_sendTarget(){
                     return;
                 }
                 uint16_t angle = static_cast<uint16_t>(degrees(_send.target) -1 + LENGTH11BIT);
-                angle_buff.push_back( static_cast<uint8_t>(angle >> 4) | _md_num);
+                angle_buff.push_back((static_cast<uint8_t>(angle >> 4) & 0b11110000) | _md_num);
                 angle_buff.push_back(static_cast<uint8_t>(angle));
             }
             _can_driver.send(UPDATE_TARGET_ID, angle_buff);
@@ -93,14 +93,14 @@ void YamaMDv3::_sendTarget(){
                 }
                 uint32_t duty = static_cast<uint32_t>((_send.target * LENGTH18BIT) + LENGTH18BIT);
                 if(duty > LENGTH19BIT - 1)      duty = LENGTH19BIT - 1;
-                speed_buff[0] = static_cast<uint8_t>(duty >> 11) | _md_num | 0b00010000;      //0b00010000のときはenable_dutyがtrueになる
+                speed_buff[0] = (static_cast<uint8_t>(duty >> 11) & 0b11100000) | _md_num | 0b00010000;      //0b00010000のときはenable_dutyがtrueになる
                 speed_buff[1] = static_cast<uint8_t>(duty >> 8);
                 speed_buff[2] = static_cast<uint8_t>(duty);
             }else{
                 //角速度を送るときはrad/sをdeg/sに変換して送る.
                 uint32_t speed = static_cast<uint32_t>((degrees(_send.target) * LENGTH18BIT) + LENGTH18BIT);
                 if(speed > LENGTH19BIT - 1)     speed = LENGTH19BIT - 1;
-                speed_buff[0] = static_cast<uint8_t>(speed >> 11) | _md_num | 0b0000000;      //0b00010000のときはenable_dutyがtrueになる
+                speed_buff[0] = (static_cast<uint8_t>(speed >> 11) & 0b11100000) | _md_num | 0b0000000;      //0b00010000のときはenable_dutyがtrueになる
                 speed_buff[1] = static_cast<uint8_t>(speed >> 8);
                 speed_buff[2] = static_cast<uint8_t>(speed);
             }
@@ -115,7 +115,7 @@ void YamaMDv3::_sendTarget(){
             }
             uint16_t duty = static_cast<uint16_t>(_send.target * LENGTH10BIT) + LENGTH10BIT;
             if(duty > LENGTH11BIT - 1)      duty = LENGTH11BIT - 1;
-            duty_buff[0] = static_cast<uint8_t>(duty >> 3) | _md_num;       //5bit目が使われてない理由はlimitSWのデータが入るようにするため(実際に入ることはなかった).
+            duty_buff[0] = (static_cast<uint8_t>(duty >> 3) & 0b11100000) | _md_num;    //5bit目が使われてない理由はlimitSWのデータが入るようにするため(実際に入ることはなかった).
             duty_buff[1] = static_cast<uint8_t>(duty);
             _can_driver.send(UPDATE_TARGET_ID, duty_buff);
         }
@@ -129,14 +129,14 @@ void YamaMDv3::_sendTarget(){
                 }
                 uint32_t duty = static_cast<uint32_t>((_send.target * LENGTH18BIT) + LENGTH18BIT);
                 if(duty > LENGTH19BIT - 1)      duty = LENGTH19BIT - 1;
-                speed_buff[0] = static_cast<uint8_t>(duty >> 11) | _md_num | 0b00010000;      //0b00010000のときはenable_dutyがtrueになる
+                speed_buff[0] = (static_cast<uint8_t>(duty >> 11) & 0b11100000) | _md_num | 0b00010000;      //0b00010000のときはenable_dutyがtrueになる
                 speed_buff[1] = static_cast<uint8_t>(duty >> 8);
                 speed_buff[2] = static_cast<uint8_t>(duty);
             }else{
                 //角速度を送るときはrad/sをdeg/sに変換して送る.
                 uint32_t speed = static_cast<uint32_t>((degrees(_send.target) * LENGTH18BIT) + LENGTH18BIT);
                 if(speed > LENGTH19BIT - 1)     speed = LENGTH19BIT - 1;
-                speed_buff[0] = static_cast<uint8_t>(speed >> 11) | _md_num | 0b0000000;      //0b00010000のときはenable_dutyがtrueになる
+                speed_buff[0] = (static_cast<uint8_t>(speed >> 11) & 0b11100000) | _md_num | 0b0000000;      //0b00010000のときはenable_dutyがtrueになる
                 speed_buff[1] = static_cast<uint8_t>(speed >> 8);
                 speed_buff[2] = static_cast<uint8_t>(speed);
             }
