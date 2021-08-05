@@ -77,7 +77,9 @@ void YamaMDv3::_sendTarget(){
                     log_e("MD%d's target is out of range\r\n",_md_num);
                     return;
                 }
-                uint16_t angle = static_cast<uint16_t>(degrees(_send.target) -1 + LENGTH11BIT);
+                int16_t angle = static_cast<int16_t>((_send.target * RAD_TO_DEG * 4096.0f / 360.0f) -1 + LENGTH11BIT);
+                if(angle > 4095)    angle = 4095;
+                else if(angle < 0)  angle = 0;
                 angle_buff.push_back((static_cast<uint8_t>(angle >> 4) & 0b11110000) | _md_num);
                 angle_buff.push_back(static_cast<uint8_t>(angle));
             }
@@ -118,6 +120,7 @@ void YamaMDv3::_sendTarget(){
             duty_buff[0] = (static_cast<uint8_t>(duty >> 3) & 0b11100000) | _md_num;    //5bit目が使われてない理由はlimitSWのデータが入るようにするため(実際に入ることはなかった).
             duty_buff[1] = static_cast<uint8_t>(duty);
             _can_driver.send(UPDATE_TARGET_ID, duty_buff);
+            break;
         }
         case EncoderMode::POV_MODE:{
             //処理の内容はspeed_modeと同じ.
@@ -144,6 +147,8 @@ void YamaMDv3::_sendTarget(){
             break;
         }
     }
+    _prev_enable_duty = _send.target;
+    _prev_target = _send.target;
 }
 
 void YamaMDv3::_receiveTargetANDLimit(){
