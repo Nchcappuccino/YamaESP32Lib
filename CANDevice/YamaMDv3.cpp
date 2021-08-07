@@ -100,7 +100,7 @@ void YamaMDv3::_sendTarget(){
                 speed_buff[2] = static_cast<uint8_t>(duty);
             }else{
                 //角速度を送るときはrad/sをdeg/sに変換して送る.
-                uint32_t speed = static_cast<uint32_t>((degrees(_send.target) * LENGTH18BIT) + LENGTH18BIT);
+                uint32_t speed = static_cast<uint32_t>((_send.target * RAD_TO_DEG) + LENGTH18BIT);
                 if(speed > LENGTH19BIT - 1)     speed = LENGTH19BIT - 1;
                 speed_buff[0] = (static_cast<uint8_t>(speed >> 11) & 0b11100000) | _md_num | 0b0000000;      //0b00010000のときはenable_dutyがtrueになる
                 speed_buff[1] = static_cast<uint8_t>(speed >> 8);
@@ -137,7 +137,7 @@ void YamaMDv3::_sendTarget(){
                 speed_buff[2] = static_cast<uint8_t>(duty);
             }else{
                 //角速度を送るときはrad/sをdeg/sに変換して送る.
-                uint32_t speed = static_cast<uint32_t>((degrees(_send.target) * LENGTH18BIT) + LENGTH18BIT);
+                uint32_t speed = static_cast<uint32_t>((_send.target * RAD_TO_DEG) + LENGTH18BIT);
                 if(speed > LENGTH19BIT - 1)     speed = LENGTH19BIT - 1;
                 speed_buff[0] = (static_cast<uint8_t>(speed >> 11) & 0b11100000) | _md_num | 0b0000000;      //0b00010000のときはenable_dutyがtrueになる
                 speed_buff[1] = static_cast<uint8_t>(speed >> 8);
@@ -156,7 +156,7 @@ void YamaMDv3::_receiveTargetANDLimit(){
         case EncoderMode::ANGLE_MODE:{
             int16_t angle = static_cast<int16_t>(_my_receive_data.buff[0] & 0b11110000) << 4;
             angle |= _my_receive_data.buff[1];
-            angle = angle - 1 + LENGTH11BIT;
+            angle = angle - 2047;
             _receive.md_state = static_cast<float>(angle) / 4096.0f * 360.0f * DEG_TO_RAD;
             _receive.limit_sw_state = static_cast<bool>(_my_receive_data.buff[2]);
             break;
@@ -187,7 +187,8 @@ void YamaMDv3::_receiveOnlyTarget(){
         case EncoderMode::SPEED_MODE:{
             int32_t speed = static_cast<int32_t>(_my_receive_data.buff[0] & 0b11100000) << 11;
             speed |= static_cast<int32_t>(_my_receive_data.buff[1] << 8) | _my_receive_data.buff[2];
-            speed = speed - LENGTH18BIT + 1;
+            speed = speed - LENGTH18BIT;
+            speed++;
             _receive.md_state = static_cast<float>(speed) * DEG_TO_RAD;
             break;
         }
@@ -202,19 +203,19 @@ void YamaMDv3::_receiveOnlyTarget(){
     }
 }
 
-void YamaMDv3::init(PIDInit_t& pid_init, uint8_t dt, SelectMDSendMode select_md_send_mode, EncoderMode enc_mode, RotationDir motor_dir, RotationDir enc_dir){
+void YamaMDv3::init(PIDInit_t& pid_init, uint8_t dt, uint16_t origin_angle, SelectMDSendMode select_md_send_mode, EncoderMode enc_mode, RotationDir motor_dir, RotationDir enc_dir){
     _init.kp.kp = pid_init.kp;
     _init.ki.ki = pid_init.ki;
     _init.kd.kd = pid_init.kd;
     _init.pid_limit = pid_init.pid_limit;
     _init.pid_min_and_max_abs = pid_init.pid_min_and_max_abs;
     _init.dt = dt;
+    _init.origin_angle = origin_angle;
     _init.select_md_send_mode = select_md_send_mode;
     _init.enc_mode = enc_mode;
     _init.motor_dir = motor_dir;
     _init.enc_dir = enc_dir;
     _sendInitData();
-    stop();
 }
 
 void YamaMDv3::move(float target){

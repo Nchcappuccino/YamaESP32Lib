@@ -104,7 +104,8 @@ class YamaMDv3{
     public:
         YamaMDv3(can_device::CANDriver& can_driver, uint8_t md_num)
             :_can_driver{can_driver}, _md_num{md_num}{_prev_target = 1234.5678f;}
-        void init(PIDInit_t& pid_init, uint8_t dt, SelectMDSendMode select_md_send_mode, EncoderMode enc_mode, RotationDir motor_dir, RotationDir enc_dir);
+        //initの関数でencの方向があってないとmdでデータを受け取ったときに方向が反転するはず.
+        void init(PIDInit_t& pid_init, uint8_t dt, uint16_t origin_angle, SelectMDSendMode select_md_send_mode, EncoderMode enc_mode, RotationDir motor_dir, RotationDir enc_dir);
         void move(float target);
         void dutyMove(float target);
         void stop();
