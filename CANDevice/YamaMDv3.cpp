@@ -218,13 +218,13 @@ void YamaMDv3::init(PIDInit_t& pid_init, uint8_t dt, uint16_t origin_angle, Sele
     _sendInitData();
 }
 
-void YamaMDv3::move(float target){
+void YamaMDv3::move(const float& target){
     _send.enable_duty = false;
     _send.target = target;
     _sendTarget();
 }
 
-void YamaMDv3::dutyMove(float target){
+void YamaMDv3::dutyMove(const float& target){
     _send.enable_duty = true;
     _send.target = target;
     _sendTarget();

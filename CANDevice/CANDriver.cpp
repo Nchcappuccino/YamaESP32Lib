@@ -12,7 +12,7 @@ void CANDriver::init(){
     Serial.printf("CAN START!\r\n");
 }
 
-void CANDriver::send(uint32_t id, std::vector<uint8_t>& buff){
+void CANDriver::send(const uint32_t& id, const std::vector<uint8_t>& buff){
     /*new演算子によるメモリの動的確保を行ってる*/
     CAN.beginPacket(id);
     uint8_t len = (uint8_t)buff.size();
@@ -33,7 +33,7 @@ void CANDriver::send(uint32_t id, std::vector<uint8_t>& buff){
     delete[] tx_buff;
 }
 
-void CANDriver::receive(uint32_t id, std::vector<uint8_t> buff, uint8_t dlc){
+void CANDriver::receive(const uint32_t& id, const std::vector<uint8_t>& buff, const uint8_t& dlc){
     can_receive_data.id = id;
     can_receive_data.buff = buff;
     can_receive_data.dlc = dlc;

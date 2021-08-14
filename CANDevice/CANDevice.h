@@ -1,3 +1,9 @@
+/**
+ * @file CANDevice.h
+ * @author Yamaguchi Yudai
+ * @brief CAN関係のライブラリをインクルードするファイル
+ * @date 2021-08-15
+ */
 #ifndef CANDEVICE_H_
 #define CANDEVICE_H_
 

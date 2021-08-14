@@ -1,3 +1,10 @@
+/**
+ * @file YamaMDv3.h
+ * @author Yamaguchi Yudai
+ * @brief CAN通信を用いたYamaMDとの通信プログラム
+ * @date 2021-08-15
+ */
+
 #ifndef YAMAMDV3_H_
 #define YAMAMDV3_H_
 
@@ -6,6 +13,10 @@
 #include "CANDriver.h"
 #include "esp_log.h"
 
+/**
+ * @brief 
+ * YamaMDv3用の名前空間
+ */
 namespace yamamdv3{
 
 //0x000はなんとなく使いたくないからなし
@@ -17,6 +28,21 @@ const uint32_t UPDATE_TARGET_ID = 0x005;
 const uint32_t MD_STATE_ID = 0x006;
 const uint32_t MD_RESET_ID = 0x007;
 
+/**
+ * @brief 
+ * ANGLE_MODEの場合
+ * 目標値は角度[rad]で目標値を与えると、MD側でいい感じに角度を合わせてくれる。
+ * SelectMDSendModeでTargetを有効にした場合は、MDからエンコーダの角度が送られてくる。(-pi~pi)
+ * SPEED_MODEの場合
+ * 目標値は角速度[rad/s]で目標値を与えると、MD側でいい感じに角速度を合わせてくれる。
+ * SelectMDSendModeでTargetを有効にした場合は、MDから角速度が送られてくる。
+ * DUTY_MODEの場合
+ * 目標値はduty比(-1.0~1.0)で目標値を与えると、MD側ではdutyに応じてモーターを動かしてくれる。
+ * SelectMDSendModeはDataDisableのみ対応。
+ * POV_MODEの場合
+ * 目標値は角度[rad/s]で目標値を与えると、MD側でいい感じに角速度を合わせてくれる。
+ * SelectMDSendModeはONLY_TARGETにのみ対応していて、MDからはモータの角度が送られてくる。
+ */
 enum class EncoderMode{
 	ANGLE_MODE = 0,
 	SPEED_MODE = 1,
@@ -30,6 +56,11 @@ enum class RotationDir{
 	NEGATIVE_DIR = -1	//通常とは逆
 };
 
+/**
+ * @brief 
+ * MDがマザーに送ってくるデータを選択する。     
+ * 基本的にはDATA_DISABLE推奨
+ */
 enum class SelectMDSendMode{
 	TARGET_AND_LIMIT_SW = 0,
 	ONLY_TARGET = 1,
@@ -59,20 +90,44 @@ typedef struct{
 		uint8_t data[4];
 	}kd;
     float pid_min_and_max_abs;
-    uint16_t pid_limit;         //ワインドアップ対策用
+
+    /**
+     * @brief 
+     * ワインドアップ対策用
+     */
+    uint16_t pid_limit;
 	uint8_t dt;		//[ms]
-    uint16_t origin_angle;      //raw_angle時の角度(0~4095)
+
+    /**
+     * @brief 
+     * raw_angle時の角度(0~4095)
+     */
+    uint16_t origin_angle;
 	RotationDir motor_dir;
 	RotationDir enc_dir;
 	EncoderMode enc_mode;
-	SelectMDSendMode select_md_send_mode;		//MDがmotherに送信するデータを選択.
+
+    /**
+     * @brief 
+     * MDがmotherに送信するデータを選択
+     */
+	SelectMDSendMode select_md_send_mode;
 }MDInitData_t;
 
 typedef struct{
 	float target;
-	bool enable_duty;   //trueなら強制的にdutyをon,falseならoff
+
+    /**
+     * @brief 
+     * trueならモードに関わらず強制的にdutyをon,falseならoff
+     */
+	bool enable_duty;
 }MotherSendData_t;
 
+/**
+ * @brief 
+ * md_stateにはSelectMDSendModeでtargetを有効にした場合、角度や角速度などEncoderModeにあった値が入る
+ */
 typedef struct{
     float md_state;
     bool limit_sw_state;
@@ -81,6 +136,12 @@ typedef struct{
 class YamaMDv3{
     private:
         can_device::CANDriver& _can_driver;
+
+        /**
+         * @brief 
+         * CANで受信した生の値が入る。
+         * 新しいデータがMDから送られてくると処理が正業に行われていれば更新される。
+         */
         can_device::CANReceiveData_t _my_receive_data;
         MDInitData_t _init;
         MotherSendData_t _send;
@@ -89,7 +150,12 @@ class YamaMDv3{
         std::vector<uint8_t> _prev_buff;
         float _prev_target;
         bool _prev_enable_duty;
-        bool _interrupt_flag;   //割り込みの処理が行われてReceiveTaskを実行する必要があるときはTrueになる
+
+        /**
+         * @brief 
+         * 割り込みの処理が行われてReceiveTaskを実行する必要があるときはTrueになる
+         */
+        bool _interrupt_flag;
         static constexpr uint16_t A3921_PWM_RESOLUTION = 2048;
         static constexpr uint16_t A3921_PWM_HALF_RESOLUTION = 1024;
         static constexpr uint16_t LENGTH10BIT = 1024;
@@ -104,15 +170,62 @@ class YamaMDv3{
     public:
         YamaMDv3(can_device::CANDriver& can_driver, uint8_t md_num)
             :_can_driver{can_driver}, _md_num{md_num}{_prev_target = 1234.5678f;}
-        //initの関数でencの方向があってないとmdでデータを受け取ったときに方向が反転するはず.
+        
+        /**
+         * @brief initの関数でencの方向があってないとmdでデータを受け取ったときに方向が反転するはず.
+         * 
+         * @param pid_init pidのゲインなどはこの構造体
+         * @param dt ms,基本的には5か10が入る。
+         * @param origin_angle origin_angleを設定する必要がないときは0にする
+         * @param select_md_send_mode 
+         * @param enc_mode 
+         * @param motor_dir 
+         * @param enc_dir 関係ない場合は、REGULAR_DIRにする。
+         */
         void init(PIDInit_t& pid_init, uint8_t dt, uint16_t origin_angle, SelectMDSendMode select_md_send_mode, EncoderMode enc_mode, RotationDir motor_dir, RotationDir enc_dir);
-        void move(float target);
-        void dutyMove(float target);
+        
+        /**
+         * @brief 
+         * ANGLE_MODE:pi~pi[rad]の範囲で角度を与える。      
+         * SPEED_MODE:角速度[rad/s]を与える。       
+         * DUTY_MODE:1.0~1.0の範囲で動かしたいdutyを与える。        
+         * POV_MODE:角速度[rad/s]を与える。     
+         * @param target 目標値 
+         */
+        void move(const float& target);
+
+        /**
+         * @brief 
+         * MODEを問わず、強制的にdutyで動かす
+         * @param target duty-1.0~1.0
+         */
+        void dutyMove(const float& target);
+
+        /**
+         * @brief 
+         * モータを止める関数
+         * モータにはトルクがかかってるので、無理やり動かそうとしても動かないので注意
+         */
         void stop();
+
+        /**
+         * @brief 
+         * CANの割り込み発生時に行う関数
+         * @param rx_data 
+         * @return true     trueの場合は受信したデータが関係ないとき
+         * @return false    falseの場合は受信したデータが自分のものであるとき
+         */
         bool interruptReceiveTask(const can_device::CANReceiveData_t& rx_data);
+
+        /**
+         * @brief 
+         * メインループで回す関数。
+         * CANの割り込み発生時に生じたデータの処理を行う。
+         * 
+         */
         void receiveTask();
-        const float getMDState() const {return _receive.md_state;}
-        const bool getLimitSWState() const {return _receive.limit_sw_state;}
+        const float& getMDState() const {return _receive.md_state;}
+        const bool& getLimitSWState() const {return _receive.limit_sw_state;}
 };
 
 

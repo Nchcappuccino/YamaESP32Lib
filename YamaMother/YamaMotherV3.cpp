@@ -1,6 +1,6 @@
 #include "YamaMotherv3.h"
 namespace yamamotherv3{
-void YamaMotherV3::LED(uint8_t array, CRGB::HTMLColorCode color){
+void YamaMotherV3::LED(uint8_t array, const CRGB::HTMLColorCode& color){
     if(array < 0 || array > 255){
         log_e("YamaMotherV3 LED array is out of range.\r\n");
         return;
@@ -18,7 +18,7 @@ void YamaMotherV3::LED(uint8_t array, CRGB::HTMLColorCode color){
     FastLED.show();
 }
 
-void YamaMotherV3::buzzer(double tone){
+void YamaMotherV3::buzzer(const double& tone){
     if(_buzzer_disable_state == false)
         ledcWriteTone(buzzer_channel, tone);
 }

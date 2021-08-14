@@ -129,8 +129,12 @@ void MPU6050::update(){
     _getMPU6050Data();
 }
 
+/**
+ * @brief 
+ * 全部表示したくないときは自由にコメントアウトしてください。
+ * もちろん追加もOKです。
+ */
 void MPU6050::printData(){
-    //全部表示したくないときはいい感じにコメントアウトしてください.
     /*
     Serial.print("interval");
     Serial.print(_interval);

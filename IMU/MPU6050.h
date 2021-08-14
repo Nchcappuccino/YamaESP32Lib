@@ -1,4 +1,9 @@
-//実験したら25分で7度ずれた
+/**
+ * @file MPU6050.h
+ * @author Yamaguchi Yudai
+ * @brief 
+ * @date 2021-08-15
+ */
 
 #ifndef MPU6050_H_
 #define MPU6050_H_
@@ -6,6 +11,11 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "esp_log.h"
+
+/**
+ * @brief mpu6050用の名前空間
+ * 
+ */
 namespace mpu6050{
 
 typedef struct{
