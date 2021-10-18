@@ -76,7 +76,7 @@ class YamaMotherV3{
          * マザーに搭載してるRGBLEDの明るさ。
          * 明るさを変えたい場合は自由に変えてください。
          */
-        static constexpr uint8_t _mother_led_brightness = 15;
+        uint8_t _mother_led_brightness = 15;
         
         /**
          * @brief 
@@ -185,6 +185,7 @@ class YamaMotherV3{
          */
         void update();
         
+        void setMotherLedBrightness(uint8_t brightness){_mother_led_brightness = brightness;}
         const uint8_t& getMotherNum() const {return _mother_num;}
         const uint8_t& getUserSW()        const {return _usersw_state;}
         const uint8_t& getDIPSW1()        const {return _dipsw1_state;}
