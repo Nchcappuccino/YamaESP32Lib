@@ -63,16 +63,16 @@ void YamaMDv3::_sendTarget(){
         case EncoderMode::ANGLE_MODE:{   
             std::vector<uint8_t> angle_buff;
             if(_send.enable_duty == true){
-                if(_send.target < -1.0f || _send.target > 1.0f){
-                    log_e("MD%d's target is out of range\r\n",_md_num);
-                    return;
-                }
+
+                _send.target = checkOutOfRange(_send.target, -1.0f, 1.0f);
+
                 uint16_t duty = static_cast<uint16_t>((_send.target * 2 * LENGTH10BIT) + LENGTH11BIT);
                 if(duty > LENGTH12BIT - 1)     duty = LENGTH12BIT - 1;
                 angle_buff.push_back((static_cast<uint8_t>(duty >> 4) & 0b11110000) | _md_num);
                 angle_buff.push_back(static_cast<uint8_t>(duty));
                 angle_buff.push_back(255);      //ここの数字はuint8_tの範囲内のものであればなんでもいい.
             }else{
+                //ここだけはcheckOutOfRangeは使ってない。
                 if(_send.target <= PI * -1.0 || _send.target > PI){
                     log_e("MD%d's target is out of range\r\n",_md_num);
                     return;
@@ -89,10 +89,9 @@ void YamaMDv3::_sendTarget(){
         case EncoderMode::SPEED_MODE:{
             std::vector<uint8_t> speed_buff(3);
             if(_send.enable_duty == true){
-                if(_send.target < -1.0f || _send.target > 1.0f){
-                    log_e("MD%d's target is out of range\r\n",_md_num);
-                    return;
-                }
+
+                _send.target = checkOutOfRange(_send.target, -1.0f, 1.0f);
+
                 uint32_t duty = static_cast<uint32_t>((_send.target * LENGTH18BIT) + LENGTH18BIT);
                 if(duty > LENGTH19BIT - 1)      duty = LENGTH19BIT - 1;
                 speed_buff[0] = (static_cast<uint8_t>(duty >> 11) & 0b11100000) | _md_num | 0b00010000;      //0b00010000のときはenable_dutyがtrueになる
@@ -111,10 +110,9 @@ void YamaMDv3::_sendTarget(){
         }
         case EncoderMode::DUTY_MODE:{
             std::vector<uint8_t> duty_buff(2);
-            if(_send.target < -1.0f || _send.target > 1.0f){
-                log_e("MD%d's target is out of range\r\n",_md_num);
-                return;
-            }
+
+            _send.target = checkOutOfRange(_send.target, -1.0f, 1.0f);
+
             uint16_t duty = static_cast<uint16_t>(_send.target * LENGTH10BIT) + LENGTH10BIT;
             if(duty > LENGTH11BIT - 1)      duty = LENGTH11BIT - 1;
             duty_buff[0] = (static_cast<uint8_t>(duty >> 3) & 0b11100000) | _md_num;    //5bit目が使われてない理由はlimitSWのデータが入るようにするため(実際に入ることはなかった).
@@ -126,10 +124,9 @@ void YamaMDv3::_sendTarget(){
             //処理の内容はspeed_modeと同じ.
             std::vector<uint8_t> speed_buff(3);
             if(_send.enable_duty == true){
-                if(_send.target < -1.0f || _send.target > 1.0f){
-                    log_e("MD%d's target is out of range\r\n",_md_num);
-                    return;
-                }
+
+                _send.target = checkOutOfRange(_send.target, -1.0f, 1.0f);
+
                 uint32_t duty = static_cast<uint32_t>((_send.target * LENGTH18BIT) + LENGTH18BIT);
                 if(duty > LENGTH19BIT - 1)      duty = LENGTH19BIT - 1;
                 speed_buff[0] = (static_cast<uint8_t>(duty >> 11) & 0b11100000) | _md_num | 0b00010000;      //0b00010000のときはenable_dutyがtrueになる

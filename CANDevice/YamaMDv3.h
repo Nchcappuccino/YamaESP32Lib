@@ -167,6 +167,15 @@ class YamaMDv3{
         void _sendTarget();
         void _receiveTargetANDLimit();
         void _receiveOnlyTarget();
+        inline float checkOutOfRange(float target, float min_range, float max_range){
+            
+            if(target > max_range)
+                target = max_range;
+            else if(target < min_range)
+                target = min_range;
+
+            return target;
+        }
     public:
         YamaMDv3(can_device::CANDriver& can_driver, uint8_t md_num)
             :_can_driver{can_driver}, _md_num{md_num}{_prev_target = 1234.5678f;}
