@@ -146,6 +146,7 @@ class YamaMDv3{
         MDInitData_t _init;
         MotherSendData_t _send;
         MotherReceiveData_t _receive;
+
         const uint8_t _md_num = 0;
         std::vector<uint8_t> _prev_buff;
         float _prev_target;
@@ -156,6 +157,7 @@ class YamaMDv3{
          * 割り込みの処理が行われてReceiveTaskを実行する必要があるときはTrueになる
          */
         bool _interrupt_flag;
+        
         static constexpr uint16_t A3921_PWM_RESOLUTION = 2048;
         static constexpr uint16_t A3921_PWM_HALF_RESOLUTION = 1024;
         static constexpr uint16_t LENGTH10BIT = 1024;
@@ -163,10 +165,12 @@ class YamaMDv3{
         static constexpr uint16_t LENGTH12BIT = 4096;
         static constexpr uint32_t LENGTH18BIT = 262144;
         static constexpr uint32_t LENGTH19BIT = 524288;
+
         void _sendInitData();
         void _sendTarget();
         void _receiveTargetANDLimit();
         void _receiveOnlyTarget();
+
         inline float checkOutOfRange(float target, float min_range, float max_range){
             
             if(target > max_range)
@@ -177,6 +181,7 @@ class YamaMDv3{
             return target;
         }
     public:
+
         YamaMDv3(can_device::CANDriver& can_driver, uint8_t md_num)
             :_can_driver{can_driver}, _md_num{md_num}{_prev_target = 1234.5678f;}
         
@@ -233,10 +238,10 @@ class YamaMDv3{
          * 
          */
         void receiveTask();
+
         const float& getMDState() const {return _receive.md_state;}
         const bool& getLimitSWState() const {return _receive.limit_sw_state;}
 };
-
 
 }/*yamamdv3*/
 
