@@ -147,6 +147,20 @@ class YamaMotherV3{
         void LED(uint8_t array, const CRGB::HTMLColorCode& color);
 
         /**
+         * @brief CRGB構造体でLEDを光らせる。
+         * 
+         * @param led CRGB
+         * @param crgb_size ledのデータサイズ
+         * 
+         * コード例
+         * CRGB data[8];
+         * for(int i = 0; i < 8; i++)
+         *   data[i] = CRGB(0xFFFFFF);
+         * yama.LED(data, sizeof(data));
+         */
+        void LED(CRGB *led, uint8_t crgb_size);
+
+        /**
          * @brief ブザーをオフにする。 
          */
         void buzzerDisable(){_buzzer_disable_state = true;}

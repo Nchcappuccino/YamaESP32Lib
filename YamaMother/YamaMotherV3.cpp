@@ -18,6 +18,15 @@ void YamaMotherV3::LED(uint8_t array, const CRGB::HTMLColorCode& color){
     FastLED.show();
 }
 
+void YamaMotherV3::LED(CRGB *led, uint8_t crgb_size){
+    if(all_led_num*3 == crgb_size){
+        memcpy(leds,led,crgb_size);
+        FastLED.show();
+    }else{
+        log_e("Data Size is error size:%d",sizeof(*leds));
+    }
+}
+
 void YamaMotherV3::buzzer(const double& tone){
     if(_buzzer_disable_state == false)
         ledcWriteTone(buzzer_channel, tone);
