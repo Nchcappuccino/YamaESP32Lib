@@ -152,6 +152,11 @@ class YamaMDv3{
         float _prev_target;
         bool _prev_enable_duty;
 
+        uint32_t _last_update_time;
+
+        //doubleの理由はハードウェア割り込み中に動かすため
+        float _prev_mdstate;
+
         /**
          * @brief 
          * 割り込みの処理が行われてReceiveTaskを実行する必要があるときはTrueになる
@@ -239,6 +244,8 @@ class YamaMDv3{
          */
         void receiveTask();
 
+        const uint32_t& getLastUpdateTime() const {return _last_update_time;}
+        const float& getPrevMDState() const {return _prev_mdstate;}
         const float& getMDState() const {return _receive.md_state;}
         const bool& getLimitSWState() const {return _receive.limit_sw_state;}
 };

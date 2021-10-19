@@ -3,11 +3,13 @@
 namespace yamamdv3{
 
 void YamaMDv3::_sendInitData(){
+
     //send reset signal
     std::vector<uint8_t> tx_reset(1);
     tx_reset[0] = _md_num;
     _can_driver.send(MD_RESET_ID, tx_reset);
     delay(5);
+
     //send kp
     std::vector<uint8_t> tx_kp;
     tx_kp.reserve(5);
@@ -16,6 +18,7 @@ void YamaMDv3::_sendInitData(){
         tx_kp.push_back(_init.kp.data[i]);
     _can_driver.send(SET_KP_ID, tx_kp);
     delay(5);
+
     //send ki
     std::vector<uint8_t> tx_ki;
     tx_ki.reserve(5);
@@ -24,6 +27,7 @@ void YamaMDv3::_sendInitData(){
         tx_ki.push_back(_init.ki.data[i]);
     _can_driver.send(SET_KI_ID, tx_ki);
     delay(5);
+
     //send kd
     std::vector<uint8_t> tx_kd;
     tx_kd.reserve(5);
@@ -32,6 +36,7 @@ void YamaMDv3::_sendInitData(){
         tx_kd.push_back(_init.kd.data[i]);
     _can_driver.send(SET_KD_ID, tx_kd);
     delay(5);
+
     //send mode etc
     std::vector<uint8_t> tx_mode(8);
     tx_mode[0] = _md_num;
@@ -43,17 +48,21 @@ void YamaMDv3::_sendInitData(){
     tx_mode[6] = static_cast<uint8_t>(_init.origin_angle);
     tx_mode[7] = static_cast<uint8_t>(_init.select_md_send_mode);
     tx_mode[7] |= (static_cast<uint8_t>(_init.enc_mode)) << 3;
+
     if(static_cast<int8_t>(_init.enc_dir) == 1)
         tx_mode[7] |= 0b01000000;
     else
         tx_mode[7] |= 0b00000000;
+
     if(static_cast<int8_t>(_init.motor_dir) == 1)
         tx_mode[7] |= 0b10000000;
     else
         tx_mode[7] |= 0b00000000;
+
     _can_driver.send(SET_DT_AND_MODE_ID, tx_mode);
     Serial.printf("md%d init finished!\r\n",_md_num);
     delay(5);
+    
 }
 
 void YamaMDv3::_sendTarget(){
@@ -239,11 +248,17 @@ bool YamaMDv3::interruptReceiveTask(const can_device::CANReceiveData_t& rx_data)
         _my_receive_data.buff = rx_data.buff;
         _my_receive_data.dlc = rx_data.dlc;
         _interrupt_flag = true;
+
         return false;
     }
 }
 
 void YamaMDv3::receiveTask(){
+
+    _last_update_time = millis();
+    if(_init.select_md_send_mode != SelectMDSendMode::DATA_DISABLE)
+        _prev_mdstate = _receive.md_state;
+
     if(_interrupt_flag == false || _init.select_md_send_mode == SelectMDSendMode::DATA_DISABLE)     return;
     switch(_init.select_md_send_mode){
         case SelectMDSendMode::TARGET_AND_LIMIT_SW:
