@@ -9,4 +9,5 @@
 
 #include "CANDriver.h"
 #include "YamaMDv3.h"
+#include "YamaSolenoidValve.h"
 #endif /*CANDEVICE_H_*/
