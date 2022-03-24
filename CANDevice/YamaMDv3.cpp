@@ -153,7 +153,7 @@ void YamaMDv3::_sendTarget(){
             break;
         }
     }
-    _prev_enable_duty = _send.target;
+    _prev_enable_duty = _send.enable_duty;
     _prev_target = _send.target;
 }
 
